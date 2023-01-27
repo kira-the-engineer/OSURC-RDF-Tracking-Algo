@@ -1,17 +1,19 @@
 """
 Tracking algorithm code for the 2022-2023 Mars Rover RDF Capstone Project
 Author: K. Kopcho
-Date Revised: 1/17/2023
+Date Revised: 1/25/2023
 
 """
 
 import gps
 from math import radians, cos, sin, asin, sqrt, atan2, degrees
+import serial
 
 #below code adapted from the GPSD Example python client. Checks if lat/long of base are finite and then saves them as floats
 #print statements are for bug testing- in actuality these coordinates will get sent over PyQt to the groundstation
 
 session = gps.gps(mode=gps.WATCH_ENABLE) #connect to the gps daemon
+port = serial.Serial('/dev/ttyACM0') #open up the ACM0 USB port because it's where the Feather is connected
 
 #start try/catch for keyboard interrupt (ctrl-c)
 try:
@@ -32,6 +34,7 @@ try:
                   (base_lat, base_lon))
         else:
             print(" Lat n/a Lon n/a")
+        
 except KeyboardInterrupt:
     # got a ^C.  Say bye, bye
     print('')

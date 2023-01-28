@@ -14,7 +14,7 @@ import serial
 #print statements are for bug testing- in actuality these coordinates will get sent over PyQt to the groundstation
 
 session = gps.gps(mode=gps.WATCH_ENABLE) #connect to the gps daemon
-port = serial.Serial('/dev/ttyACM0') #open up the ACM0 USB port because it's where the Feather is connected
+port = serial.Serial('/dev/ttyACM1') #open up the ACM0 USB port because it's where the Feather is connected
 
 #the following function is based on the equations found here: https://www.movable-type.co.uk/scripts/latlong.html
 def forward_bearing(base_lat, base_long, rover_lat, rover_long): 
@@ -51,6 +51,7 @@ def base_read():
 
 def rover_read():
     line = port.read(100) #read size of buffer
+    
 
 #start try/catch for keyboard interrupt (ctrl-c)
 try:

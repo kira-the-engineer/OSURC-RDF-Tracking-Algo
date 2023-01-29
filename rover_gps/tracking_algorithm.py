@@ -1,7 +1,7 @@
 """
 Tracking algorithm code for the 2022-2023 Mars Rover RDF Capstone Project
 Author: K. Kopcho
-Date Revised: 1/25/2023
+Date Revised: 1/28/2023
 
 """
 
@@ -14,7 +14,7 @@ import serial
 #print statements are for bug testing- in actuality these coordinates will get sent over PyQt to the groundstation
 
 session = gps.gps(mode=gps.WATCH_ENABLE) #connect to the gps daemon
-port = serial.Serial('/dev/ttyACM1') #open up the ACM0 USB port because it's where the Feather is connected
+port = serial.Serial('/dev/ttyACM1') #open up the ACM USB port because it's where the Feather is connected
 
 #the following function is based on the equations found here: https://www.movable-type.co.uk/scripts/latlong.html
 def forward_bearing(base_lat, base_long, rover_lat, rover_long): 
@@ -50,7 +50,13 @@ def base_read():
         return blat, blon
 
 def rover_read():
-    line = port.read(100) #read size of buffer
+    line = port.readline() #reads line ended by '\n'
+    line = str(line.decode()) #converts line bytes into a string literal
+    coords = line.split(',') #splits line data into a multiple index list using a delimiter
+    lat = float(coords[0]) #save first index as latitude
+    long = float(coords[1]) #save last index as longitude
+
+    return lat, long
     
 
 #start try/catch for keyboard interrupt (ctrl-c)
@@ -64,7 +70,10 @@ try:
         if(b_lat == -1 and b_lon == -1): #if we're not connected or lat/lon isn't finite
             print(" Lat n/a Lon n/a")
         else:
-            print("base lat: %.6f, base lon: %.6f" % (b_lat, b_lon))
+            print("base lat: %.6f, base lon: %.6f \n" % (b_lat, b_lon))
+    
+        r_lat, r_lon = rover_read()
+        print("rover lat: %.1f, rover long %.1f \n" % (r_lat, r_lon))
 
               
 except KeyboardInterrupt:

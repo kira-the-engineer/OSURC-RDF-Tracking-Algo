@@ -30,7 +30,7 @@ def forward_bearing(base_lat, base_long, rover_lat, rover_long):
     #do the actual math now, again this is based on the equations on the moveable-type site
     y = math.sin(diff_long) * math.cos(rover_lat)
     x = math.cos(base_lat) * math.sin(rover_lat) - math.sin(base_lat) * math.cos(rover_lat) * math.cos(diff_long)
-    theta = numpy.atan2(y, x)
+    theta = math.atan2(y, x)
     bearing = (theta * 180/numpy.pi + 360) % 360 #gets degrees from 0 to 360
 
     return bearing
@@ -73,7 +73,10 @@ try:
             print("base lat: %.6f, base lon: %.6f \n" % (b_lat, b_lon))
     
         r_lat, r_lon = rover_read()
-        print("rover lat: %.1f, rover long %.1f \n" % (r_lat, r_lon))
+        print("rover lat: %.6f, rover long %.6f \n" % (r_lat, r_lon))
+
+        bearing = forward_bearing(b_lat, b_lon, r_lat, r_lon)
+        print("current bearing angle: %.1f degrees \n" % (bearing))
 
               
 except KeyboardInterrupt:

@@ -7,10 +7,8 @@ Date Revised: 1/28/2023
 
 import gps
 import math
-import numpy
 import serial
 
-#below code adapted from the GPSD Example python client. Checks if lat/long of base are finite and then saves them as floats
 #print statements are for bug testing- in actuality these coordinates will get sent over PyQt to the groundstation
 
 session = gps.gps(mode=gps.WATCH_ENABLE) #connect to the gps daemon
@@ -31,10 +29,11 @@ def forward_bearing(base_lat, base_long, rover_lat, rover_long):
     y = math.sin(diff_long) * math.cos(rover_lat)
     x = math.cos(base_lat) * math.sin(rover_lat) - math.sin(base_lat) * math.cos(rover_lat) * math.cos(diff_long)
     theta = math.atan2(y, x)
-    bearing = (theta * 180/numpy.pi + 360) % 360 #gets degrees from 0 to 360
+    bearing = (theta * 180/math.pi + 360) % 360 #converts rads back to degrees from 0 to 360
 
     return bearing
 
+#below code adapted from the GPSD Example python client. Checks if lat/long of base are finite and then saves them as floats
 def base_read():
         if ((gps.isfinite(session.fix.latitude) and
              gps.isfinite(session.fix.longitude))): #makes sure we have a finite lat/lon
@@ -65,6 +64,11 @@ try:
         if session.read() == 0:
                 if not (gps.MODE_SET & session.valid): #ensure we have a TPV Packet from read
                     continue
+
+        if gps.TIME_SET & session.valid: #print the time if available
+            print("Base GPS Time: ", session.fix.time)
+        else:
+            print("base gps time n/a")
     
         b_lat, b_lon = base_read() #get values from the base gps
         if(b_lat == -1 and b_lon == -1): #if we're not connected or lat/lon isn't finite
@@ -80,7 +84,6 @@ try:
 
               
 except KeyboardInterrupt:
-    # got a ^C.  Say bye, bye
     print('')
 
 # Got ^C, or fell out of the loop.  Cleanup, and leave.

@@ -12,7 +12,7 @@ import serial
 class TrackingAlgorithm:
     
 #the following function is based on the equations found here: https://www.movable-type.co.uk/scripts/latlong.html
-    def forward_bearing(base_lat, base_long, rover_lat, rover_long): 
+    def forward_bearing(self, base_lat, base_long, rover_lat, rover_long): 
         diff_long = (rover_long - base_long)
 
         #convert to radians before doing calculations
@@ -31,7 +31,7 @@ class TrackingAlgorithm:
         return bearing
 
     #below code adapted from the GPSD Example python client. Checks if lat/long of base are finite and then saves them as floats
-    def base_read():
+    def base_read(self, session):
             if ((gps.isfinite(session.fix.latitude) and
                 gps.isfinite(session.fix.longitude))): #makes sure we have a finite lat/lon
             
@@ -45,7 +45,7 @@ class TrackingAlgorithm:
 
             return blat, blon
 
-    def rover_read(port):
+    def rover_read(self, port):
         line = port.readline() #reads line ended by '\n'
         line = str(line.decode()) #converts line bytes into a string literal
         coords = line.split(',') #splits line data into a multiple index list using a delimiter
@@ -63,7 +63,7 @@ class TrackingAlgorithm:
                         if not (gps.MODE_SET & session.valid): #ensure we have a TPV Packet from read
                             continue
             
-                b_lat, b_lon = self.base_read() #get values from the base gps
+                b_lat, b_lon = self.base_read(session) #get values from the base gps
                 if(b_lat == -1 and b_lon == -1): #if we're not connected or lat/lon isn't finite
                     print(" Lat n/a Lon n/a")
                 else:

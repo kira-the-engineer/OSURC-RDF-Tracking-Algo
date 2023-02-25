@@ -10,6 +10,14 @@ import math
 import serial
 
 class TrackingAlgorithm:
+
+
+#define Class variables below here
+    r_lat = -1;
+    r_lon = -1;
+    b_lat = -1;
+    b_lon = -1;
+    bearing = 0;    
     
 #the following function is based on the equations found here: https://www.movable-type.co.uk/scripts/latlong.html
     def forward_bearing(self, base_lat, base_long, rover_lat, rover_long): 
@@ -26,9 +34,9 @@ class TrackingAlgorithm:
         y = math.sin(diff_long) * math.cos(rover_lat)
         x = math.cos(base_lat) * math.sin(rover_lat) - math.sin(base_lat) * math.cos(rover_lat) * math.cos(diff_long)
         theta = math.atan2(y, x)
-        bearing = (theta * 180/math.pi + 360) % 360 #converts rads back to degrees from 0 to 360
+        fbearing = (theta * 180/math.pi + 360) % 360 #converts rads back to degrees from 0 to 360
 
-        return bearing
+        return fbearing
 
     #below code adapted from the GPSD Example python client. Checks if lat/long of base are finite and then saves them as floats
     def base_read(self, session):
@@ -63,18 +71,18 @@ class TrackingAlgorithm:
                         if not (gps.MODE_SET & session.valid): #ensure we have a TPV Packet from read
                             continue
             
-                b_lat, b_lon = self.base_read(session) #get values from the base gps
-                if(b_lat == -1 and b_lon == -1): #if we're not connected or lat/lon isn't finite
+                self.b_lat, self.b_lon = self.base_read(session) #get values from the base gps
+                if(self.b_lat == -1 and self.b_lon == -1): #if we're not connected or lat/lon isn't finite
                     print(" Lat n/a Lon n/a")
                 else:
-                    print("base lat: %.6f, base lon: %.6f \n" % (b_lat, b_lon))
+                    print("base lat: %.6f, base lon: %.6f \n" % (self.b_lat, self.b_lon))
             
-                r_lat, r_lon = self.rover_read(port)
-                print("rover lat: %.6f, rover long %.6f \n" % (r_lat, r_lon))
+                self.r_lat, self.r_lon = self.rover_read(port)
+                print("rover lat: %.6f, rover long %.6f \n" % (self.r_lat, self.r_lon))
 
-                if(b_lat != -1 and b_lon != -1):
-                    bearing = self.forward_bearing(b_lat, b_lon, r_lat, r_lon)
-                    print("current bearing angle: %.1f degrees \n" % (bearing))
+                if(self.b_lat != -1 and self.b_lon != -1):
+                    self.bearing = self.forward_bearing(self.b_lat, self.b_lon, self.r_lat, self.r_lon)
+                    print("current bearing angle: %.1f degrees \n" % (self.bearing))
                 else:
                     print("Cannot produce bearing angle, make sure GPS modules are getting a fix")
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1066</width>
+    <width>842</width>
     <height>628</height>
    </rect>
   </property>
@@ -99,7 +99,7 @@
     <item row="3" column="0">
      <layout class="QGridLayout" name="gridLayout_6">
       <item row="0" column="2">
-       <widget class="QLabel" name="label_11">
+       <widget class="QLabel" name="bearing_angle">
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -164,7 +164,7 @@
      </layout>
     </item>
     <item row="8" column="0">
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="manual_angle_pb">
       <property name="text">
        <string>Send Angle</string>
       </property>
@@ -230,7 +230,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label_9">
+         <widget class="QLabel" name="rover_lon">
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -253,7 +253,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label_8">
+         <widget class="QLabel" name="base_lon">
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -287,7 +287,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label_6">
+         <widget class="QLabel" name="rover_lat">
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -313,7 +313,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label_5">
+         <widget class="QLabel" name="base_lat">
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -354,7 +354,7 @@
     <item row="7" column="0">
      <layout class="QGridLayout" name="gridLayout_8">
       <item row="0" column="2">
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="manual_angle_text"/>
       </item>
       <item row="0" column="1">
        <spacer name="horizontalSpacer_9">

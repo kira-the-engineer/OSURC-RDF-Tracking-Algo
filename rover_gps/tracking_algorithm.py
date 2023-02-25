@@ -1,7 +1,7 @@
 """
 Tracking algorithm code for the 2022-2023 Mars Rover RDF Capstone Project
 Author: K. Kopcho
-Date Revised: 1/28/2023
+Date Revised: 2/21/2023
 
 """
 
@@ -64,11 +64,6 @@ try:
         if session.read() == 0:
                 if not (gps.MODE_SET & session.valid): #ensure we have a TPV Packet from read
                     continue
-
-        if gps.TIME_SET & session.valid: #print the time if available
-            print("Base GPS Time: ", session.fix.time)
-        else:
-            print("base gps time n/a")
     
         b_lat, b_lon = base_read() #get values from the base gps
         if(b_lat == -1 and b_lon == -1): #if we're not connected or lat/lon isn't finite
@@ -79,10 +74,12 @@ try:
         r_lat, r_lon = rover_read()
         print("rover lat: %.6f, rover long %.6f \n" % (r_lat, r_lon))
 
-        bearing = forward_bearing(b_lat, b_lon, r_lat, r_lon)
-        print("current bearing angle: %.1f degrees \n" % (bearing))
+        if(b_lat != -1 and b_lon != -1):
+            bearing = forward_bearing(b_lat, b_lon, r_lat, r_lon)
+            print("current bearing angle: %.1f degrees \n" % (bearing))
+        else:
+            print("Cannot produce bearing angle, make sure GPS modules are getting a fix")
 
-              
 except KeyboardInterrupt:
     print('')
 

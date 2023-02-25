@@ -45,7 +45,7 @@ class TrackingAlgorithm:
 
             return blat, blon
 
-    def rover_read():
+    def rover_read(port):
         line = port.readline() #reads line ended by '\n'
         line = str(line.decode()) #converts line bytes into a string literal
         coords = line.split(',') #splits line data into a multiple index list using a delimiter
@@ -55,6 +55,8 @@ class TrackingAlgorithm:
         return lat, long
 
     def run_algo(self):
+        session = gps.gps(mode=gps.WATCH_ENABLE) #connect to the gps daemon
+        port = serial.Serial('/dev/ttyACM1') #open up the ACM USB port because it's where the Feather is connected
         try:
             while 1:
                 if session.read() == 0:
@@ -67,7 +69,7 @@ class TrackingAlgorithm:
                 else:
                     print("base lat: %.6f, base lon: %.6f \n" % (b_lat, b_lon))
             
-                r_lat, r_lon = self.rover_read()
+                r_lat, r_lon = self.rover_read(port)
                 print("rover lat: %.6f, rover long %.6f \n" % (r_lat, r_lon))
 
                 if(b_lat != -1 and b_lon != -1):

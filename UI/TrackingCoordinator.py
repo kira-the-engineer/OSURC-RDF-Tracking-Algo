@@ -1,22 +1,28 @@
-from PyQt5 import QtWidgets, QtCore, QtGui, uic
+from PyQt5 import QtWidgets, QtCore, QtGui
 import sys
 #get path to tracking algorithm
 sys.path.insert(1, '/home/groundstation/github/OSURC-RDF-Tracking-Algo/rover_gps')
 import tracking_algorithm
 
-class TrackingCore(QtWidgets.QWidget):
-    def __init__(self):
-        super(TrackingCore, self).__init__()
-        trackingAlgo = tracking_algorithm.TrackingAlgorithm()
-        uic.loadUi('TrackingAlgoDisp.ui', self)
-        self.show()
+#create threaded class to avoid blocking UI updates
+class TrackingCore(QtCore.QThread):
+	#create signals
+	rover_lat_update_ready__signal = QtCore.pyqtSignal(float)
+	rover_lon_update_ready__signal = QtCore.pyqtSignal(float)
 
-	self.rover_lat = QLabel()
-	self.rover_lon = QLabel()
+	def __init__(self):
+		super(TrackingCore,self).__init__()
+		self.rover_lat = QLabel()
+		self.rover_lon = QLabel()
 
-    def on_update_rover_coordinates_ready(self, algo):
-        
+		## Class Variables ##
+		self.current_rover_lat = -1
+		self.current_rover_lon = -1
 
-app = QtWidgets.QApplication(sys.argv)
-window = TrackingCore()
-app.exec_()
+	def rover_latitude_changed__slot(self, trackingAlgo):
+		self.current_rover_lat = trackingAlgo.r_lat
+		self.rover_lat_update_ready__signal.emit(current_rover_lat)
+
+	def rover_longitide_changed__slot(self, trackingAlgo):
+		self.current_rover_lon = trackingAlgo.r_lon
+		self.rover_lon_update_ready__signal.emit(current_rover_lon)

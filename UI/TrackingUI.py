@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore, QtGui, uic
+from PyQt5 import QtWidgets, QtCore, QtGui, QtSerialPort, uic
 import sys
 import TrackingCoordinator as track
 from functools import partial
@@ -18,8 +18,14 @@ class TrackingUI(QtWidgets.QWidget):
 		self.manual_angle_pb.setEnabled(False)
 		#set validator for angle text
 		validator = QtGui.QDoubleValidator(0.00, 360.00, 2)
-		#self.manual_angle_text.setValidator(validator)
+		
+		#create serial object
+		self.serial = QtSerialPort.QSerialPort('/dev/ttyACM1')
+		self.serial.setBaudRate(9600) #set baud to 9600
+		
+		#connect signals and slots
 		self.manual_angle_text.editingFinished.connect(partial(self.verify_angle, validator))
+		self.manual_angle_pb.clicked.connect(self.send_angle)
 	
 	def updateRLat(self, value):
 		self.rover_lat.setNum(value)
@@ -39,6 +45,10 @@ class TrackingUI(QtWidgets.QWidget):
 			self.manual_angle_pb.setEnabled(True)
 		if(state[0] == QtGui.QValidator.Invalid or state[0] == QtGui.QValidator.Intermediate):
 			self.manual_angle_pb.setEnabled(False)
+			
+	def send_angle(self):
+		angle = self.manual_angle_text.text()
+		self.serial.write(angle.encode())
 		 
 
 app = QtWidgets.QApplication(sys.argv)

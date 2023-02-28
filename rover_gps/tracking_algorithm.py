@@ -1,7 +1,7 @@
 """
 Tracking algorithm code for the 2022-2023 Mars Rover RDF Capstone Project
 Author: K. Kopcho
-Date Revised: 2/21/2023
+Date Revised: 2/27/2023
 
 """
 
@@ -70,6 +70,8 @@ class TrackingAlgorithm:
                 if session.read() == 0:
                         if not (gps.MODE_SET & session.valid): #ensure we have a TPV Packet from read
                             continue
+                            
+                print("Base GPS Time %s" % session.fix.time)
             
                 self.b_lat, self.b_lon = self.base_read(session) #get values from the base gps
                 if(self.b_lat == -1 and self.b_lon == -1): #if we're not connected or lat/lon isn't finite

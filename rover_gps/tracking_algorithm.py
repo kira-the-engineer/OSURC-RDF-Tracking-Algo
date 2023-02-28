@@ -57,8 +57,10 @@ class TrackingAlgorithm:
         line = port.readline() #reads line ended by '\n'
         line = str(line.decode()) #converts line bytes into a string literal
         coords = line.split(',') #splits line data into a multiple index list using a delimiter
-        lat = float(coords[0]) #save first index as latitude
-        long = float(coords[1]) #save last index as longitude
+        time = coords[0]
+        print("Rover GPS Time %s", time)
+        lat = float(coords[1]) #save first index as latitude
+        long = float(coords[2]) #save last index as longitude
 
         return lat, long
 

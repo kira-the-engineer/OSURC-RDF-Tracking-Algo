@@ -20,8 +20,11 @@ class TrackingUI(QtWidgets.QWidget):
 		validator = QtGui.QDoubleValidator(0.00, 360.00, 2)
 		
 		#create serial object
-		self.serial = QtSerialPort.QSerialPort('/dev/ttyACM1')
+		self.serial = QtSerialPort.QSerialPort('/dev/ttyUSB0')
 		self.serial.setBaudRate(9600) #set baud to 9600
+		self.serial.setDataBits(8) # data bits to 8
+		self.serial.setStopBits(1) # 1 stop bit to match UART specs
+		
 		
 		#connect signals and slots
 		self.manual_angle_text.editingFinished.connect(partial(self.verify_angle, validator))
@@ -48,6 +51,7 @@ class TrackingUI(QtWidgets.QWidget):
 			
 	def send_angle(self):
 		angle = self.manual_angle_text.text()
+		self.serial.open(QtCore.QIODevice.WriteOnly)
 		self.serial.write(angle.encode())
 		 
 

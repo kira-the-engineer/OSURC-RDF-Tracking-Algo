@@ -1,13 +1,14 @@
 """
 Tracking algorithm code for the 2022-2023 Mars Rover RDF Capstone Project
 Author: K. Kopcho
-Date Revised: 2/27/2023
+Date Revised: 2/28/2023
 
 """
 
 import gps
 import math
 import serial
+import struct
 
 class TrackingAlgorithm:
 
@@ -58,7 +59,7 @@ class TrackingAlgorithm:
         line = str(line.decode()) #converts line bytes into a string literal
         coords = line.split(',') #splits line data into a multiple index list using a delimiter
         time = coords[0]
-        print("Rover GPS Time %s", time)
+        print("Rover GPS Time: %s" % time)
         lat = float(coords[1]) #save first index as latitude
         long = float(coords[2]) #save last index as longitude
 
@@ -67,6 +68,15 @@ class TrackingAlgorithm:
     def run_algo(self):
         session = gps.gps(mode=gps.WATCH_ENABLE) #connect to the gps daemon
         port = serial.Serial('/dev/ttyACM1') #open up the ACM USB port because it's where the Feather is connected
+        
+        #initialize parameters for USB serial to motor controller
+        usb = serial.Serial('/dev/ttyUSB0') #open up USB port for serial comms to turntable controller
+        #configure for UART protocol
+        usb.baudrate = 9600 #9600 baud
+        usb.bytesize = 8 #8 bit data
+        usb.stopbit = 1
+        
+        
         try:
             while 1:
                 if session.read() == 0:
@@ -87,6 +97,8 @@ class TrackingAlgorithm:
                 if(self.b_lat != -1 and self.b_lon != -1):
                     self.bearing = self.forward_bearing(self.b_lat, self.b_lon, self.r_lat, self.r_lon)
                     print("current bearing angle: %.1f degrees \n" % (self.bearing))
+                    bytes = struct.pack('f', self.bearing)
+                    usb.write(bytes)
                 else:
                     print("Cannot produce bearing angle, make sure GPS modules are getting a fix")
 

@@ -18,7 +18,7 @@ void loop() {
   //cast these to char strings, since that's what's expected from the actual transciever
   String latstr(lat, 6);
   String lonstr(lon, 6);
-  String serialstr = "Time Placeholder " + latstr + "," + lonstr + "\n";
+  String serialstr = latstr + "," + lonstr + "," + Time Placeholder + "\n";
   Serial.print(serialstr);
 
 }

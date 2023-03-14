@@ -10,6 +10,7 @@ import math
 import serial
 import struct
 import time
+from multiprocessing.connection import Client
 
 class TrackingAlgorithm:
 
@@ -19,7 +20,8 @@ class TrackingAlgorithm:
 	r_lon = -1;
 	b_lat = -1; 
 	b_lon = -1;
-	bearing = 0;    
+	bearing = 0;
+	sender_string = "" 
     
 #the following function is based on the equations found here: https://www.movable-type.co.uk/scripts/latlong.html
 	def forward_bearing(self, base_lat, base_long, rover_lat, rover_long): 
@@ -67,7 +69,7 @@ class TrackingAlgorithm:
 
         	return lat, long
 
-	def run_algo(self):
+	def run_algo(self, client):
         	session = gps.gps(mode=gps.WATCH_ENABLE) #connect to the gps daemon
         	port = serial.Serial('/dev/ttyACM1') #open up the ACM USB port because it's where the Feather is connected
         
@@ -103,8 +105,13 @@ class TrackingAlgorithm:
                     			print(bytes.encode())
                     			time.sleep(1)
                     			usb.write(bytes.encode())
+                    			client.send(self.sender_string)
                 		else:
                     			print("Cannot produce bearing angle, make sure GPS modules are getting a fix")
+                    			#normally this would go up higher in the function but the gps is being difficult so it's printing regardless of the data we get
+                    			self.sender_string = str(self.b_lat) + ", " + str(self.b_lon) + ", " + str(self.r_lat) + ", " + str(self.r_lon) + ", " + str(self.bearing)
+                    			client.send(self.sender_string)
+                    			
 
         	except KeyboardInterrupt:
             		print('')
@@ -115,8 +122,10 @@ class TrackingAlgorithm:
 
 
 def main():
-    	algo = TrackingAlgorithm()
-    	algo.run_algo()
+	addr = ('localhost', 5000) #open a socket at addr 5000
+	tracking_client = Client(addr)
+	algo = TrackingAlgorithm()
+	algo.run_algo(tracking_client) #pass sender into main running function so messages can be sent every cycle
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import sys
 import random
 from time import sleep
+from multiprocessing.connection import Listener
 
 #Dearborn Hall coordinates: 44.56688122224506, -123.27560553741544
 #Near Merryfield coordinates: 44.566890589052235, -123.27462028171236
@@ -50,9 +51,18 @@ class TrackingCore(QtCore.QThread):
 		sleep(0.2)
 		
 	def run(self):
+		addr = ('localhost', 5000)
+		ui_listener = Listener(addr)
+		conn = ui_listener.accept() #accept conn from tracking algo
+		msg = ""
 		while 1:
 			self.rover_latitude_changed__slot()
 			self.rover_longitude_changed__slot()
 			self.base_latitude_changed__slot()
 			self.base_longitude_changed__slot()
+			
+			if conn.poll():
+				msg = conn.recv()
+				print(f"got message: {msg}")
+		conn.close()
 			

@@ -12,6 +12,7 @@ class TrackingUI(QtWidgets.QWidget):
 		self.tThread.rover_lon_update_ready__signal.connect(self.updateRLon)
 		self.tThread.base_lat_update_ready__signal.connect(self.updateBLat)
 		self.tThread.base_lon_update_ready__signal.connect(self.updateBLon)
+		self.tThread.bearing_update_ready__signal.connect(self.updateBearing)
 		self.tThread.start()
 		
 		#only enable PB for manual angle on valid input in text box, default state is disabled
@@ -41,6 +42,9 @@ class TrackingUI(QtWidgets.QWidget):
 		
 	def updateBLon(self, value):
 		self.base_lon.setNum(value)
+		
+	def updateBearing(self,value):
+		self.bearing_angle.setNum(value)
 		
 	def verify_angle(self, validator):
 		state = validator.validate(self.manual_angle_text.text(), 0)

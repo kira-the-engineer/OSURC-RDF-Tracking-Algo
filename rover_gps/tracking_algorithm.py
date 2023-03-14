@@ -105,19 +105,20 @@ class TrackingAlgorithm:
                     			print(bytes.encode())
                     			time.sleep(1)
                     			usb.write(bytes.encode())
+                    			self.sender_string = str(self.b_lat) + ", " + str(self.b_lon) + ", " + str(self.r_lat) + ", " + str(self.r_lon) + ", " + str(self.bearing)
                     			client.send(self.sender_string)
                 		else:
                     			print("Cannot produce bearing angle, make sure GPS modules are getting a fix")
-                    			#normally this would go up higher in the function but the gps is being difficult so it's printing regardless of the data we get
-                    			self.sender_string = str(self.b_lat) + ", " + str(self.b_lon) + ", " + str(self.r_lat) + ", " + str(self.r_lon) + ", " + str(self.bearing)
-                    			client.send(self.sender_string)
+                    			client.send("ERROR")
                     			
 
         	except KeyboardInterrupt:
             		print('')
+            	
 
         	# Got ^C, or fell out of the loop.  Cleanup, and leave.
         	session.close()
+        	client.close()
         	exit(0)
 
 

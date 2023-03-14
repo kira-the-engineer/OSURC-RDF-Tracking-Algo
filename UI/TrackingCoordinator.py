@@ -15,6 +15,7 @@ class TrackingCore(QtCore.QThread):
 	rover_lon_update_ready__signal = QtCore.pyqtSignal(float)
 	base_lat_update_ready__signal = QtCore.pyqtSignal(float)
 	base_lon_update_ready__signal = QtCore.pyqtSignal(float)
+	bearing_update_ready__signal = QtCore.pyqtSignal(float)
 
 	def __init__(self):
 		super(TrackingCore,self).__init__()
@@ -23,7 +24,25 @@ class TrackingCore(QtCore.QThread):
 		self.current_rover_lon = -1
 		self.current_base_lat = -1
 		self.current_base_lon = -1
+		self.current_bearing = -1
 		
+		
+	def tracking_updates_callback(self, str):
+		updates = str.split(',')
+		self.current_base_lat = float(updates[0])
+		self.current_base_lon = float(updates[1])
+		self.current_rover_lat = float(updates[2])
+		self.current_rover_lon = float(updates[3])
+		self.current_bearing = float(updates[4])
+		
+		self.base_lat_update_ready__signal.emit(self.current_base_lat)
+		self.base_lon_update_ready__signal.emit(self.current_base_lon)
+		self.rover_lat_update_ready__signal.emit(self.current_rover_lat)
+		self.rover_lon_update_ready__signal.emit(self.current_rover_lon)
+		self.bearing_update_ready__signal.emit(self.current_bearing)
+	
+	"""
+	#Verification functions below here	
 	def get_random_coordinate(self, start_val, stop_val):
 		coord = random.uniform(start_val, stop_val)
 		return coord
@@ -49,6 +68,7 @@ class TrackingCore(QtCore.QThread):
 		self.current_base_lon = self.get_random_coordinate(-119.274620, -125.274620)
 		self.base_lon_update_ready__signal.emit(self.current_base_lon)
 		sleep(0.2)
+	"""
 		
 	def run(self):
 		addr = ('localhost', 5000)
@@ -56,13 +76,13 @@ class TrackingCore(QtCore.QThread):
 		conn = ui_listener.accept() #accept conn from tracking algo
 		msg = ""
 		while 1:
-			self.rover_latitude_changed__slot()
-			self.rover_longitude_changed__slot()
-			self.base_latitude_changed__slot()
-			self.base_longitude_changed__slot()
-			
 			if conn.poll():
 				msg = conn.recv()
 				print(f"got message: {msg}")
+				if(msg == "ERROR"):
+					print("Tracking algorithm encountered an error")
+					continue
+				else:
+					self.tracking_updates_callback(msg)
 		conn.close()
 			
